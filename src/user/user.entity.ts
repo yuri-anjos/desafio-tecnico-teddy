@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { CompactUrl } from 'src/compact-url/compact-url.entity';
+import { CompactUrl } from '../compact-url/compact-url.entity';
 
 @Entity('user')
 export class User {

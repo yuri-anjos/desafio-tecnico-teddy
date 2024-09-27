@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SigninUserDto, SignupUserDto, TokenDto } from './auth.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { plainToClass } from 'class-transformer';
-import { UserDto } from 'src/user/user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -14,41 +16,36 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(signupUserDto: SignupUserDto): Promise<TokenDto> {
-    const userAlreadyExists = await this.userService.findByEmail(
-      signupUserDto.email,
-    );
+  async signup(dto: SignupUserDto): Promise<TokenDto> {
+    const userAlreadyExists = await this.userService.findByEmail(dto.email);
     if (userAlreadyExists) {
-      throw new Error('Email already in use');
+      throw new ConflictException('Email already in use');
     }
 
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(signupUserDto.password, salt);
+    const hashedPassword = await bcrypt.hash(dto.password, salt);
 
-    const newUser = await this.userService.create({
-      ...signupUserDto,
+    const user = await this.userService.create({
+      ...dto,
       password: hashedPassword,
     } as User);
 
     const accessToken = this.jwtService.sign({
-      id: newUser.id,
+      id: user.id,
     });
-
-    const userDto = plainToClass(UserDto, newUser);
-    return { user: userDto, accessToken };
+    return new TokenDto({ user, accessToken });
   }
 
-  async signin(signinUserDto: SigninUserDto): Promise<TokenDto> {
-    const user = await this.userService.findByEmail(signinUserDto.email);
-    if (!user || !(await user.validatePassword(signinUserDto.password))) {
-      throw new Error('Invalid credentials');
+  async signin(dto: SigninUserDto): Promise<TokenDto> {
+    const user = await this.userService.findByEmail(dto.email);
+    if (!user || !(await user.validatePassword(dto.password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const accessToken = this.jwtService.sign({
       id: user.id,
     });
 
-    const userDto = plainToClass(UserDto, user);
-    return { user: userDto, accessToken };
+    return new TokenDto({ user, accessToken });
   }
 }

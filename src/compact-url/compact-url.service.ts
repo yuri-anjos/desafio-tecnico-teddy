@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompactUrl } from './compact-url.entity';
-import { User } from 'src/user/user.entity';
+import { User } from '../user/user.entity';
 import { createHash } from 'crypto';
+import { SaveCompactUrlDto } from './compact-url.dto';
 
 @Injectable()
 export class CompactUrlService {
@@ -12,14 +17,16 @@ export class CompactUrlService {
     private readonly compactUrlRepository: Repository<CompactUrl>,
   ) {}
 
-  async findById(id: number, user: User): Promise<CompactUrl> {
+  async findById(id: number): Promise<CompactUrl> {
     const found = await this.compactUrlRepository.findOne({
-      where: { id, user },
+      where: { id },
+      relations: ['user'],
     });
 
     if (!found) {
-      throw new Error('Compact url not found');
+      throw new NotFoundException('Compact URL not found');
     }
+
     return found;
   }
 
@@ -36,25 +43,43 @@ export class CompactUrlService {
   }
 
   async findByUrlCode(urlCode: string): Promise<CompactUrl> {
-    const compactedUrl = await this.compactUrlRepository.findOne({
+    const compactUrl = await this.compactUrlRepository.findOne({
       where: { urlCode },
     });
-    compactedUrl.clickCount++;
-    return this.compactUrlRepository.save(compactedUrl);
-  }
-
-  async insert(compactUrl: CompactUrl): Promise<CompactUrl> {
-    compactUrl.id = undefined;
-    compactUrl.urlCode = this.generateUrlCode(compactUrl.originalUrl);
+    compactUrl.clickCount++;
     return this.compactUrlRepository.save(compactUrl);
   }
 
-  async update(id: number, compactedUrl: CompactUrl): Promise<CompactUrl> {
-    compactedUrl.urlCode = this.generateUrlCode(compactedUrl.originalUrl);
-    this.compactUrlRepository.update(id, compactedUrl);
-    return this.compactUrlRepository.findOne({ where: { id } });
+  async insert(user: User, dto: SaveCompactUrlDto): Promise<CompactUrl> {
+    const compactUrl = new CompactUrl();
+    compactUrl.user = user;
+    compactUrl.originalUrl = dto.originalUrl;
+    compactUrl.urlCode = this.generateUrlCode(dto.originalUrl);
+
+    return this.compactUrlRepository.save(compactUrl);
   }
-  delete(compactUrl: CompactUrl): void {
+
+  async update(
+    user: User,
+    id: number,
+    dto: SaveCompactUrlDto,
+  ): Promise<CompactUrl> {
+    const compactUrl = await this.findById(id);
+    if (compactUrl.user?.id !== user.id) {
+      throw new ForbiddenException('Unauthorized');
+    }
+
+    compactUrl.originalUrl = dto.originalUrl;
+    compactUrl.urlCode = this.generateUrlCode(dto.originalUrl);
+
+    return this.compactUrlRepository.save(compactUrl);
+  }
+  async delete(user: User, id: number): Promise<void> {
+    const compactUrl = await this.findById(id);
+    if (compactUrl.user?.id !== user.id) {
+      throw new ForbiddenException('Unauthorized');
+    }
+
     this.compactUrlRepository.softRemove(compactUrl);
   }
 

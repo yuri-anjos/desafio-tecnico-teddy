@@ -1,13 +1,7 @@
-import { IsUrl } from 'class-validator';
+import { IsNotEmpty, IsUrl } from 'class-validator';
 
 export class SaveCompactUrlDto {
+  @IsNotEmpty()
   @IsUrl()
   originalUrl: string;
-}
-
-export class CompactUrlDto {
-  originalUrl: string;
-  compactedUrl: string;
-  urlCode: string;
-  clickCount: number;
 }
