@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('Teddy API')
     .setDescription('Api para desafio tecnico')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -15,9 +15,16 @@ import { JwtAuthGuard } from '../auth/components/jwt-auth.guard';
 import { User } from '../user/user.entity';
 import { GetUser } from '../auth/components/get-user.decorator';
 import { ApplyUser } from '../auth/components/apply-user.guard';
-import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CompactUrl } from './compact-url.entity';
 
+@ApiBearerAuth()
 @ApiTags('compact-url')
 @Controller('compact-url')
 export class CompactUrlController {
