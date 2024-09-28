@@ -1,4 +1,4 @@
-# NestJS TypeScript TypeORM PostgreSQL
+# NestJS TypeScript TypeORM PostgreSQL Jest
 
 ## Project setup
 
@@ -31,3 +31,8 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+##
+
+- docker-compose up postgres
+- docker-compose up --build
