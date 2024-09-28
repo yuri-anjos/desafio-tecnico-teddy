@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { SigninUserDto, SignupUserDto } from './auth.dto';
+import { SigninUserDto, SignupUserDto, TokenType } from './auth.dto';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
@@ -89,37 +89,7 @@ describe('AuthService', () => {
   });
 
   describe('signin', () => {
-    it('should throw UnauthorizedException if user not found', async () => {
-      const dto = new SigninUserDto();
-      dto.email = 'user@email.com';
-      dto.password = 'password';
-
-      mockUserService.findByEmail.mockResolvedValue(null);
-
-      const result = service.signin(dto);
-      await expect(result).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('should throw UnauthorizedException if password is invalid', async () => {
-      const dto = new SigninUserDto();
-      dto.email = 'user@email.com';
-      dto.password = 'password';
-
-      const user = new User();
-      user.id = 1;
-      user.validatePassword = jest.fn().mockResolvedValue(false);
-
-      mockUserService.findByEmail.mockResolvedValue(user);
-
-      const result = service.signin(dto);
-      await expect(result).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('should return a token', async () => {
-      const dto = new SigninUserDto();
-      dto.email = 'user@email.com';
-      dto.password = 'password';
-
+    it('should signin successfully', async () => {
       const user = new User();
       user.id = 1;
       user.validatePassword = jest.fn().mockResolvedValue(true);
@@ -127,14 +97,13 @@ describe('AuthService', () => {
       const expected = new UserDto(user);
 
       const accessToken = 'access_token';
-
-      mockUserService.findByEmail.mockResolvedValue(user);
       mockJwtService.sign.mockReturnValue(accessToken);
 
-      const result = await service.signin(dto);
+      const result = await service.signin(user);
 
       expect(result.user).toEqual(expected);
       expect(result.accessToken).toEqual(accessToken);
+      expect(result.type).toEqual(TokenType);
     });
   });
 });

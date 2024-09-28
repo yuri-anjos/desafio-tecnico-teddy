@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { SigninUserDto, SignupUserDto, TokenDto } from './auth.dto';
 import { LocalAuthGuard } from './components/local-auth.guard';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetUser } from './components/get-user.decorator';
+import { User } from '../user/user.entity';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -32,7 +34,7 @@ export class AuthController {
   @Post('signin')
   @HttpCode(201)
   @UseGuards(LocalAuthGuard)
-  signin(@Body() signinUserDto: SigninUserDto): Promise<TokenDto> {
-    return this.authService.signin(signinUserDto);
+  signin(@GetUser() user: User): Promise<TokenDto> {
+    return this.authService.signin(user);
   }
 }

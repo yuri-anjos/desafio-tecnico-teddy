@@ -31,15 +31,12 @@ export class SigninUserDto {
   password: string;
 }
 
+export const TokenType = 'Bearer';
 export class TokenDto {
-  constructor(partial: Partial<TokenDto>) {
-    Object.assign(this, partial);
-  }
-
   @ApiProperty()
   accessToken: string;
   @ApiProperty()
-  type: string = 'Bearer';
+  type: string;
   @ApiProperty()
   user: UserDto;
 }

@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SigninUserDto, SignupUserDto, TokenDto } from './auth.dto';
+import { SigninUserDto, SignupUserDto, TokenDto, TokenType } from './auth.dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -34,19 +34,14 @@ export class AuthService {
     const accessToken = this.jwtService.sign({
       id: user.id,
     });
-    return new TokenDto({ user: new UserDto(user), accessToken });
+    return { user: new UserDto(user), accessToken, type: TokenType };
   }
 
-  async signin(dto: SigninUserDto): Promise<TokenDto> {
-    const user = await this.userService.findByEmail(dto.email);
-    if (!user || !(await user.validatePassword(dto.password))) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
+  async signin(user: User): Promise<TokenDto> {
     const accessToken = this.jwtService.sign({
       id: user.id,
     });
 
-    return new TokenDto({ user: new UserDto(user), accessToken });
+    return { user: new UserDto(user), accessToken, type: TokenType };
   }
 }

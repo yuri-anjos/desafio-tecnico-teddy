@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Response,
   UseGuards,
 } from '@nestjs/common';
 import { CompactUrlService } from './compact-url.service';
@@ -23,6 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CompactUrl } from './compact-url.entity';
+import * as express from 'express';
 
 @ApiBearerAuth()
 @ApiTags('compact-url')
@@ -64,9 +66,12 @@ export class CompactUrlController {
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiParam({ name: 'urlCode', type: String, required: true })
   @Get(':urlCode')
-  async findByUrlCode(@Param('urlCode') urlCode: string): Promise<string> {
+  async findByUrlCode(
+    @Param('urlCode') urlCode: string,
+    @Response() res: express.Response,
+  ) {
     const result = await this.compactUrlService.findByUrlCode(urlCode);
-    return result.originalUrl;
+    return res.redirect(308, result.originalUrl);
   }
 
   @ApiResponse({

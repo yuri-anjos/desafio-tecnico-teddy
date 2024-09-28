@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SigninUserDto, SignupUserDto } from './auth.dto';
+import { SignupUserDto } from './auth.dto';
+import { User } from '../user/user.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -44,13 +45,11 @@ describe('AuthController', () => {
 
   describe('signin', () => {
     it('should call signin service', async () => {
-      const signinUserDto = new SigninUserDto();
-      signinUserDto.email = 'email';
-      signinUserDto.password = 'password';
+      const mockUser = new User();
 
-      await controller.signin(signinUserDto);
+      await controller.signin(mockUser);
 
-      expect(mockAuthService.signin).toHaveBeenCalledWith(signinUserDto);
+      expect(mockAuthService.signin).toHaveBeenCalledWith(mockUser);
       expect(mockAuthService.signin).toHaveBeenCalledTimes(1);
     });
   });
