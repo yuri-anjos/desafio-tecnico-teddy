@@ -6,6 +6,17 @@
 $ npm install
 ```
 
+```bash
+# TO RUN LOCALLY
+$ docker-compose up postgres
+$ npm start
+
+# OR
+
+# TO RUN ON DOCKER
+$ docker-compose up --build
+```
+
 ## Compile and run the project
 
 ```bash
@@ -14,9 +25,6 @@ $ npm run start
 
 # watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 ## Run tests
@@ -31,8 +39,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-##
-
-- docker-compose up postgres
-- docker-compose up --build
