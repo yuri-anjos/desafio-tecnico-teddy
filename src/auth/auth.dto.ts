@@ -1,25 +1,31 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { User } from '../user/user.entity';
+import { UserDto } from 'src/user/user.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupUserDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   password: string;
 }
 
 export class SigninUserDto {
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   password: string;
@@ -30,7 +36,10 @@ export class TokenDto {
     Object.assign(this, partial);
   }
 
-  readonly accessToken: string;
-  readonly type: string = 'Bearer';
-  readonly user: User;
+  @ApiProperty()
+  accessToken: string;
+  @ApiProperty()
+  type: string = 'Bearer';
+  @ApiProperty()
+  user: UserDto;
 }

@@ -46,6 +46,11 @@ export class CompactUrlService {
     const compactUrl = await this.compactUrlRepository.findOne({
       where: { urlCode },
     });
+
+    if (!compactUrl) {
+      throw new NotFoundException('Url not found');
+    }
+
     compactUrl.clickCount++;
     return this.compactUrlRepository.save(compactUrl);
   }

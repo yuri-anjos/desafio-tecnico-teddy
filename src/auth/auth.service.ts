@@ -8,6 +8,7 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserDto } from '../user/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +34,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign({
       id: user.id,
     });
-    return new TokenDto({ user, accessToken });
+    return new TokenDto({ user: new UserDto(user), accessToken });
   }
 
   async signin(dto: SigninUserDto): Promise<TokenDto> {
@@ -46,6 +47,6 @@ export class AuthService {
       id: user.id,
     });
 
-    return new TokenDto({ user, accessToken });
+    return new TokenDto({ user: new UserDto(user), accessToken });
   }
 }

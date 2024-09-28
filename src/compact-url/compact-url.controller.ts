@@ -15,30 +15,59 @@ import { JwtAuthGuard } from '../auth/components/jwt-auth.guard';
 import { User } from '../user/user.entity';
 import { GetUser } from '../auth/components/get-user.decorator';
 import { ApplyUser } from '../auth/components/apply-user.guard';
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CompactUrl } from './compact-url.entity';
 
+@ApiTags('compact-url')
 @Controller('compact-url')
 export class CompactUrlController {
   constructor(private readonly compactUrlService: CompactUrlService) {}
 
+  @ApiResponse({
+    status: 200,
+    description: 'All compacted urls',
+    type: CompactUrl,
+    isArray: true,
+  })
   @Get()
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<CompactUrl[]> {
     const result = await this.compactUrlService.findAll();
     return result;
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'All compacted urls of authenticated user',
+    type: CompactUrl,
+    isArray: true,
+  })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async findAllByUser(@GetUser() user: User): Promise<any[]> {
+  async findAllByUser(@GetUser() user: User): Promise<CompactUrl[]> {
     const result = await this.compactUrlService.findAllByUser(user);
     return result;
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Get original url by urlCode',
+    type: String,
+  })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiParam({ name: 'urlCode', type: String, required: true })
   @Get(':urlCode')
   async findByUrlCode(@Param('urlCode') urlCode: string): Promise<string> {
     const result = await this.compactUrlService.findByUrlCode(urlCode);
     return result.originalUrl;
   }
 
+  @ApiResponse({
+    status: 201,
+    description: 'Creates a new compacted url',
+    type: String,
+  })
+  @ApiBody({ type: SaveCompactUrlDto })
   @Post()
   @HttpCode(201)
   @UseGuards(ApplyUser)
@@ -50,6 +79,16 @@ export class CompactUrlController {
     return `http://localhost:${process.env.API_PORT}/compact-url/${result.urlCode}`;
   }
 
+  @ApiResponse({
+    status: 200,
+    description: 'Updates a compacted url',
+    type: String,
+  })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 403, description: 'Not authorized' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiParam({ name: 'id', type: Number, required: true })
+  @ApiBody({ type: SaveCompactUrlDto })
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   async update(
@@ -61,6 +100,14 @@ export class CompactUrlController {
     return `http://localhost:${process.env.API_PORT}/compact-url/${result.urlCode}`;
   }
 
+  @ApiResponse({
+    status: 204,
+    description: 'Deletes a compacted url',
+  })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 403, description: 'Not authorized' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiParam({ name: 'id', type: Number, required: true })
   @Delete(':id')
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
