@@ -69,7 +69,7 @@ describe('CompactUrlController', () => {
         redirect: jest.fn(),
       } as unknown as express.Response;
       await controller.findByUrlCode(urlCode, res);
-      expect(res.redirect).toHaveBeenCalledWith(308, originalUrl);
+      expect(res.redirect).toHaveBeenCalledWith(302, originalUrl);
     });
   });
 
