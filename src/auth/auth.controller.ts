@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Logger,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninUserDto, SignupUserDto, TokenDto } from './auth.dto';
 import { LocalAuthGuard } from './components/local-auth.guard';
@@ -10,6 +17,7 @@ import { User } from '../user/user.entity';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  private readonly logger = new Logger(AuthController.name);
 
   @ApiResponse({
     status: 200,
@@ -20,6 +28,7 @@ export class AuthController {
   @ApiBody({ type: SignupUserDto })
   @Post('signup')
   signup(@Body() signupUserDto: SignupUserDto): Promise<TokenDto> {
+    this.logger.log('signup');
     return this.authService.signup(signupUserDto);
   }
 
@@ -35,6 +44,7 @@ export class AuthController {
   @HttpCode(201)
   @UseGuards(LocalAuthGuard)
   signin(@GetUser() user: User): Promise<TokenDto> {
+    this.logger.log('signin');
     return this.authService.signin(user);
   }
 }

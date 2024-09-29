@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Logger,
   Param,
   Post,
   Put,
@@ -31,6 +32,7 @@ import * as express from 'express';
 @Controller('compact-url')
 export class CompactUrlController {
   constructor(private readonly compactUrlService: CompactUrlService) {}
+  private readonly logger = new Logger(CompactUrlController.name);
 
   @ApiResponse({
     status: 200,
@@ -40,6 +42,7 @@ export class CompactUrlController {
   })
   @Get()
   async findAll(): Promise<CompactUrl[]> {
+    this.logger.log('findAll');
     const result = await this.compactUrlService.findAll();
     return result;
   }
@@ -54,6 +57,7 @@ export class CompactUrlController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async findAllByUser(@GetUser() user: User): Promise<CompactUrl[]> {
+    this.logger.log('findAllByUser');
     const result = await this.compactUrlService.findAllByUser(user);
     return result;
   }
@@ -70,6 +74,7 @@ export class CompactUrlController {
     @Param('urlCode') urlCode: string,
     @Response() res: express.Response,
   ) {
+    this.logger.log('findByUrlCode');
     const result = await this.compactUrlService.findByUrlCode(urlCode);
     return res.redirect(302, result.originalUrl);
   }
@@ -87,6 +92,7 @@ export class CompactUrlController {
     @GetUser() user: User,
     @Body() dto: SaveCompactUrlDto,
   ): Promise<string> {
+    this.logger.log('insert');
     const result = await this.compactUrlService.insert(user, dto);
     return `http://localhost:${process.env.API_PORT}/compact-url/${result.urlCode}`;
   }
@@ -108,6 +114,7 @@ export class CompactUrlController {
     @Param('id') id: number,
     @Body() dto: SaveCompactUrlDto,
   ): Promise<string> {
+    this.logger.log('update');
     const result = await this.compactUrlService.update(user, id, dto);
     return `http://localhost:${process.env.API_PORT}/compact-url/${result.urlCode}`;
   }
@@ -124,6 +131,7 @@ export class CompactUrlController {
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   async delete(@GetUser() user: User, @Param('id') id: number): Promise<void> {
+    this.logger.log('delete');
     this.compactUrlService.delete(user, id);
   }
 }

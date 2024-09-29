@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,13 +18,17 @@ export class CompactUrlService {
     private readonly compactUrlRepository: Repository<CompactUrl>,
   ) {}
 
+  private readonly logger = new Logger(CompactUrlService.name);
+
   async findById(id: number): Promise<CompactUrl> {
+    this.logger.log('findById');
     const found = await this.compactUrlRepository.findOne({
       where: { id },
       relations: ['user'],
     });
 
     if (!found) {
+      this.logger.error('Compact URL not found');
       throw new NotFoundException('Compact URL not found');
     }
 
@@ -31,10 +36,12 @@ export class CompactUrlService {
   }
 
   findAll() {
+    this.logger.log('findAll');
     return this.compactUrlRepository.find();
   }
 
   findAllByUser(user: User): Promise<CompactUrl[]> {
+    this.logger.log('findAllByUser');
     return this.compactUrlRepository.find({
       where: {
         user,
@@ -43,11 +50,13 @@ export class CompactUrlService {
   }
 
   async findByUrlCode(urlCode: string): Promise<CompactUrl> {
+    this.logger.log('findByUrlCode');
     const compactUrl = await this.compactUrlRepository.findOne({
       where: { urlCode },
     });
 
     if (!compactUrl) {
+      this.logger.error('Url not found');
       throw new NotFoundException('Url not found');
     }
 
@@ -56,6 +65,7 @@ export class CompactUrlService {
   }
 
   async insert(user: User, dto: SaveCompactUrlDto): Promise<CompactUrl> {
+    this.logger.log('insert');
     const compactUrl = new CompactUrl();
     compactUrl.user = user;
     compactUrl.originalUrl = dto.originalUrl;
@@ -69,8 +79,10 @@ export class CompactUrlService {
     id: number,
     dto: SaveCompactUrlDto,
   ): Promise<CompactUrl> {
+    this.logger.log('update');
     const compactUrl = await this.findById(id);
     if (compactUrl.user?.id !== user.id) {
+      this.logger.error('Unauthorized');
       throw new ForbiddenException('Unauthorized');
     }
 
@@ -79,9 +91,12 @@ export class CompactUrlService {
 
     return this.compactUrlRepository.save(compactUrl);
   }
+
   async delete(user: User, id: number): Promise<void> {
+    this.logger.log('delete');
     const compactUrl = await this.findById(id);
     if (compactUrl.user?.id !== user.id) {
+      this.logger.error('Unauthorized');
       throw new ForbiddenException('Unauthorized');
     }
 
@@ -89,6 +104,8 @@ export class CompactUrlService {
   }
 
   generateUrlCode(originalUrl: string): string {
+    this.logger.log('generateUrlCode');
+
     // Gera um hash SHA-256 da URL original
     const hash = createHash('sha256').update(originalUrl).digest('hex');
 

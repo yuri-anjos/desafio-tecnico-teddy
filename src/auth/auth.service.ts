@@ -1,9 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { SigninUserDto, SignupUserDto, TokenDto, TokenType } from './auth.dto';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { SignupUserDto, TokenDto, TokenType } from './auth.dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
@@ -17,9 +13,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private readonly logger = new Logger(AuthService.name);
+
   async signup(dto: SignupUserDto): Promise<TokenDto> {
+    this.logger.log('signup');
     const userAlreadyExists = await this.userService.findByEmail(dto.email);
     if (userAlreadyExists) {
+      this.logger.error('Email already in use');
       throw new ConflictException('Email already in use');
     }
 
@@ -38,6 +38,7 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<TokenDto> {
+    this.logger.log('signin');
     const accessToken = this.jwtService.sign({
       id: user.id,
     });
