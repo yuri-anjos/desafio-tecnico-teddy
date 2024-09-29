@@ -1,33 +1,50 @@
-# NestJS TypeScript TypeORM PostgreSQL Jest
+# Desafio Tecnico Teddy
+
+## Technologies
+
+- Node.js
+- NestJS
+- TypeScript
+- TypeORM
+- PostgreSQL
+- Swagger
+- Jest
+- Docker
 
 ## Project setup
 
-```bash
-$ npm install
-```
+### Configure .env
 
 ```bash
-# TO RUN LOCALLY
+# Make sure to adjust the environment variables in the .env file according to your configuration needs.
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=myuser
+DB_PASSWORD=mypassword
+DB_NAME=teddydb
+API_PORT=3000
+JWT_SECRET=mysecretsecret
+```
+
+### Run
+
+```bash
+$ npm install
+
+### TO RUN LOCALLY
 $ docker-compose up postgres
 $ npm start
 
-# OR
+### OR
 
-# TO RUN ON DOCKER
+### TO RUN ON DOCKER
 $ docker-compose up --build
-```
 
-## Compile and run the project
 
-```bash
-# development
 $ npm run start
-
-# watch mode
-$ npm run start:dev
 ```
 
-## Run tests
+### Testing
 
 ```bash
 # unit tests
@@ -39,3 +56,7 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Points for Improvement for Horizontal Scalability
+
+Implementing microservices with load balancing and cache results.
