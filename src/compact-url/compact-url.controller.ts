@@ -71,7 +71,7 @@ export class CompactUrlController {
     @Response() res: express.Response,
   ) {
     const result = await this.compactUrlService.findByUrlCode(urlCode);
-    return res.redirect(308, result.originalUrl);
+    return res.redirect(302, result.originalUrl);
   }
 
   @ApiResponse({
