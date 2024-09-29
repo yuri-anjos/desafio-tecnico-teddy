@@ -31,6 +31,7 @@ JWT_SECRET=mysecretsecret
 ```bash
 $ npm install
 
+
 ### TO RUN LOCALLY
 $ docker-compose up postgres
 $ npm start
@@ -39,9 +40,6 @@ $ npm start
 
 ### TO RUN ON DOCKER
 $ docker-compose up --build
-
-
-$ npm run start
 ```
 
 ### Testing
