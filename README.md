@@ -13,7 +13,7 @@
 
 ## Project setup
 
-### Configure .env
+### Configure .env on root directory
 
 ```bash
 # Make sure to adjust the environment variables in the .env file according to your configuration needs.
